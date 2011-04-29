@@ -56,6 +56,7 @@ if __name__ == "__main__":
     
     libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial', False)
     libtcod.sys_set_fps(LIMIT_FPS)
+    libtcod.sys_set_renderer(libtcod.RENDERER_SDL) # stick with SDL for now until other renderers are more stable
     
     #   main game loop
     while not libtcod.console_is_window_closed():
