@@ -76,5 +76,5 @@ def handle_keys(key, player):
         
         if key.vk == libtcod.KEY_CHAR:
             msg += ": {char}".format(char=chr(key.c))
-        console.message(msg,libtcod.light_orange)
+        return msg
     

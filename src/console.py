@@ -28,6 +28,8 @@ MSG_HEIGHT = SCREEN_HEIGHT - GAME_HEIGHT - 1
 
 LIMIT_FPS = 30
 
+
+
 font = os.path.join('data', 'fonts', 'dejavu10x10_gs_tc.png')
 libtcod.console_set_custom_font(font, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
@@ -35,7 +37,7 @@ libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial'
 libtcod.sys_set_fps(LIMIT_FPS)
 libtcod.sys_set_renderer(libtcod.RENDERER_SDL) # stick with SDL for now until other renderers are more stable
 
-viewport = console(GAME_WIDTH,GAME_HEIGHT)
+viewport = console(GAME_WIDTH,GAME_HEIGHT,0,0)
 libtcod.console_set_default_foreground(viewport.con, libtcod.white)
 
 message = console(MSG_WIDTH, MSG_HEIGHT,0,GAME_HEIGHT+1)
@@ -52,19 +54,25 @@ libtcod.console_print_ex(0,GAME_WIDTH,GAME_HEIGHT,libtcod.BKGND_NONE, libtcod.LE
 
 # history of messages to the player
 # the last element is the most recent message
-msghist = []
+msghist = ["c","c","c","c","c","c","c","c"]
 
 def silentmessage(str):
+    global msghist
     '''
     silently appends a message to the message history without blitting to the screen
     '''
-    msghist.append(str)
+    if str != None:
+        msghist.append(str)
 
 def showmessage(str, color=libtcod.white):
+    global msghist
     '''
     prints a message to the player-viewable message window
     and appends the message to the message history
     '''
+    if str == None:
+        return
+    
     msghist.append(str)
     
     libtcod.console_clear(message.con)
@@ -76,7 +84,7 @@ def showmessage(str, color=libtcod.white):
         
         if msgindex > 0:
             libtcod.console_set_default_foreground(message.con, applyval(color,value))
-            libtcod.console_print(message.con, 0, MSG_HEIGHT-i, msghist[len(msghist) - i])
+            libtcod.console_print(message.con, 0, MSG_HEIGHT-i, msghist[msgindex])
     
     print(str)
 
@@ -92,10 +100,10 @@ def applyval(color, value):
     return newcolor
     
 def show(thing):
-    libtcod.console_put_char(viewport, thing.x, thing.y, thing.char)
+    libtcod.console_put_char(viewport.con, thing.x, thing.y, thing.char)
 
 def hide(thing):
-    libtcod.console_put_char(viewport, thing.x, thing.y, ' ')
+    libtcod.console_put_char(viewport.con, thing.x, thing.y, ' ')
 
 def blit(console, ffade=1.0, bfade=1.0):
     libtcod.console_blit(console.con, 0, 0, console.width, console.height, 0, console.x, console.y, ffade, bfade)
