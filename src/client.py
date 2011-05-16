@@ -6,6 +6,7 @@ Created on May 12, 2011
 
 import libtcodpy as libtcod
 import console
+
 '''
     this statement is rather silly
     obviously once real client/server code is in you won't be 
@@ -27,33 +28,47 @@ if __name__ == "__main__":
         packet = engine.play(key)
         
         for turn in packet:
+			
+			# print FPS
+            console.showfps()
             
             # screen blits a maximum of once per 10 turns
             # TO DO: find a way to do this without "munching" outlier actions
             if turn.turn - lastBlit > 10:
                 lastBlit = turn.turn
                 
-                # print FPS
-                console.showfps()
+                
                 
                 # update the viewport
                 for actor in turn.actors:
                     console.show(actor)
                 console.blit(console.viewport)
                 
+                
                 # update the message port
                 for msg in turn.msgs:
-                    console.showmessage(msg,libtcod.light_orange)
+					console.addmessage(msg)
+				
+                console.showmessages(libtcod.light_orange)
+                    
                 console.blit(console.message)
+                
+                libtcod.console_flush()
                 
                 # 'disappear' the entities in the viewport to prevent trails
                 # this must happen after the last screen flush of the turn
                 for actor in turn.actors:
                     console.hide(actor)
+                    
                 
             else:
                 # save any messages that aren't being printed just yet
                 for msg in turn.msgs:
-                    console.silentmessage(msg)
+                    console.addmessage(msg)
+                    
+                # print messages anyway
+                console.showmessages(libtcod.light_orange)
+                console.blit(console.message)
+                libtcod.console_flush()
                     
             

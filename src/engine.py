@@ -11,7 +11,7 @@ import keys
 import creatures
 # from console import *   # import console variable definitions into global
 from player import *    # import player definition into global
-
+import copy
 
 
 
@@ -46,7 +46,7 @@ def play(key):
         
         # the minimum value of the next turn is when the player will next act
         minTurn = player.nextTurn
-        
+
         # now we tell all the other actors to act
         for item in actors:
             
@@ -56,7 +56,7 @@ def play(key):
             if curTurn < item.nextTurn < minTurn:
                 minTurn = item.nextTurn
         
-        turns.append(turn(actors,msgs,curTurn))
+        turns.append(turn(copy.deepcopy(actors),copy.deepcopy(msgs),curTurn))
         print curTurn
         
         curTurn = minTurn
@@ -76,9 +76,6 @@ class turn:
         self.actors = actors
         self.msgs = msgs
         self.turn = turn
-
-       
-            
                         
         
         

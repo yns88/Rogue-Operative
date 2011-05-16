@@ -26,12 +26,14 @@ GAME_HEIGHT = 35
 MSG_WIDTH = GAME_WIDTH
 MSG_HEIGHT = SCREEN_HEIGHT - GAME_HEIGHT - 1
 
-LIMIT_FPS = 30
+LIMIT_FPS = 60
 
 
 
 font = os.path.join('data', 'fonts', 'dejavu10x10_gs_tc.png')
 libtcod.console_set_custom_font(font, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+
+
 
 libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial', False)
 libtcod.sys_set_fps(LIMIT_FPS)
@@ -56,24 +58,21 @@ libtcod.console_print_ex(0,GAME_WIDTH,GAME_HEIGHT,libtcod.BKGND_NONE, libtcod.LE
 # the last element is the most recent message
 msghist = ["c","c","c","c","c","c","c","c"]
 
-def silentmessage(str):
+def addmessage(str):
     global msghist
     '''
     silently appends a message to the message history without blitting to the screen
     '''
     if str != None:
         msghist.append(str)
+        print(str)
 
-def showmessage(str, color=libtcod.white):
+
+def showmessages(color=libtcod.white):
     global msghist
     '''
-    prints a message to the player-viewable message window
-    and appends the message to the message history
+    prints the recent message history
     '''
-    if str == None:
-        return
-    
-    msghist.append(str)
     
     libtcod.console_clear(message.con)
     
@@ -86,7 +85,6 @@ def showmessage(str, color=libtcod.white):
             libtcod.console_set_default_foreground(message.con, applyval(color,value))
             libtcod.console_print(message.con, 0, MSG_HEIGHT-i, msghist[msgindex])
     
-    print(str)
 
 def applyval(color, value):
     newcolor = libtcod.Color(0,0,0)
@@ -107,11 +105,10 @@ def hide(thing):
 
 def blit(console, ffade=1.0, bfade=1.0):
     libtcod.console_blit(console.con, 0, 0, console.width, console.height, 0, console.x, console.y, ffade, bfade)
-    libtcod.console_flush()
+    # libtcod.console_flush()
     
 def showfps():
     # print FPS
     libtcod.console_print_ex(0,SCREEN_WIDTH-1,SCREEN_HEIGHT-1, libtcod.BKGND_NONE, libtcod.RIGHT, 'FPS:' + libtcod.sys_get_fps().__str__())
-    
     
     
