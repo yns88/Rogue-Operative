@@ -1,3 +1,4 @@
+import random
 
 smap = ['##############################################',
 		'#######################      #################',
@@ -34,18 +35,18 @@ class map:
 
 		for i in range(w):
 			for j in range(h):
-				self.setTile(i,j,2)
+				self.setTile(i,j,(2,0))
 
 		y = 0
 		for line in smap:
 			x = 0
 			for c in line:
 				if c == '#':
-					self.setTile(x,y,1)
+					self.setTile(x,y,(1,random.randint(0,20)))
 				elif c == ' ':
-					self.setTile(x,y,0)
+					self.setTile(x,y,(0,0))
 				else:
-					self.setTile(x,y,-1)
+					self.setTile(x,y,(-1,0))
 				x = x + 1
 			y = y + 1
 		

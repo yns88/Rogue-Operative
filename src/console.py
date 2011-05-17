@@ -8,6 +8,7 @@ This module attempts to encapsulate much of the really ugly libtcod.console* lib
 
 import libtcodpy as libtcod
 import os
+# import random
 
 class console:
     def __init__(self,width,height,x,y):
@@ -118,10 +119,12 @@ def printmap(map):
 			tile = tiletochar(map.getTile(x,y))
 			libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
 			
-def tiletochar(char):
-	if char == 0:
-		return ' ', libtcod.white, libtcod.black
-	elif char == 1:
-		return '#', libtcod.brass, libtcod.black
+def tiletochar(tuple):
+	
+	
+	if tuple[0] == 0:
+		return ' ', libtcod.white, applyval(libtcod.desaturated_orange,-20)
+	elif tuple[0] == 1:
+		return ' ', libtcod.white, applyval(libtcod.dark_sepia,tuple[1])
 	else: 
 		return 'x', libtcod.pink, libtcod.black

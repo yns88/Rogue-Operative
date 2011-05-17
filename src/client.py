@@ -61,7 +61,7 @@ if __name__ == "__main__":
                 # 'disappear' the entities in the viewport to prevent trails
                 # this must happen after the last screen flush of the turn
                 #for actor in turn.actors:
-                #    console.hide(actor)
+                #    console.hide(actor,turn.map)
                     
                 
             else:

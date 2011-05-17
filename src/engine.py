@@ -24,7 +24,7 @@ minTurn = 0         # minimum number of turns to next iteration of game loop
 player = player()   # the player character
 
 orc = creatures.Orc(10,10)
-bat = creatures.Bat(30,30)
+bat = creatures.Bat(15,15)
 actors = [player,orc,bat]  # player is not in the list of actors, but is always a relevant actor
 
 map = map.map(55,35)
