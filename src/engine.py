@@ -12,8 +12,7 @@ import creatures
 # from console import *   # import console variable definitions into global
 from player import *    # import player definition into global
 import copy
-
-
+import map
 
 
 '''
@@ -27,6 +26,8 @@ player = player()   # the player character
 orc = creatures.Orc(10,10)
 bat = creatures.Bat(30,30)
 actors = [player,orc,bat]  # player is not in the list of actors, but is always a relevant actor
+
+map = map.map(55,35)
 
 def play(key):
     global curTurn,minTurn,player,actors
@@ -56,7 +57,7 @@ def play(key):
             if curTurn < item.nextTurn < minTurn:
                 minTurn = item.nextTurn
         
-        turns.append(turn(copy.deepcopy(actors),copy.deepcopy(msgs),curTurn))
+        turns.append(turn(map,copy.deepcopy(actors),copy.deepcopy(msgs),curTurn))
         print curTurn
         
         curTurn = minTurn
@@ -66,17 +67,17 @@ def play(key):
     
     # if the player can act now, do so    
     player.act(curTurn)
-    turns.append(turn(actors,[msg],curTurn))
+    turns.append(turn(map,actors,[msg],curTurn))
     
     return turns
     
 
 class turn:
-    def __init__(self, actors=[], msgs=[], turn=0):
+    def __init__(self, map, actors=[], msgs=[], turn=0):
         self.actors = actors
         self.msgs = msgs
         self.turn = turn
-                        
+        self.map = map         
         
         
         

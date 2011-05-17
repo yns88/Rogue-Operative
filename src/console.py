@@ -56,7 +56,7 @@ libtcod.console_print_ex(0,GAME_WIDTH,GAME_HEIGHT,libtcod.BKGND_NONE, libtcod.LE
 
 # history of messages to the player
 # the last element is the most recent message
-msghist = ["c","c","c","c","c","c","c","c"]
+msghist = [" "," "," "," "," "," "," "," "]
 
 def addmessage(str):
     global msghist
@@ -112,3 +112,16 @@ def showfps():
     libtcod.console_print_ex(0,SCREEN_WIDTH-1,SCREEN_HEIGHT-1, libtcod.BKGND_NONE, libtcod.RIGHT, 'FPS:' + libtcod.sys_get_fps().__str__())
     
     
+def printmap(map):
+	for x in range(0,map.width):
+		for y in range(0,map.height):
+			tile = tiletochar(map.getTile(x,y))
+			libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
+			
+def tiletochar(char):
+	if char == 0:
+		return ' ', libtcod.white, libtcod.black
+	elif char == 1:
+		return '#', libtcod.brass, libtcod.black
+	else: 
+		return 'x', libtcod.pink, libtcod.black
