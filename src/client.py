@@ -28,14 +28,17 @@ if __name__ == "__main__":
         packet = engine.play(key)
         
         for turn in packet:
-			
+		    
 			# print FPS
             console.showfps()
             
             # screen blits a maximum of once per 10 turns
             # TO DO: find a way to do this without "munching" outlier actions
-            if turn.turn - lastBlit > 10:
+            if turn.turn - lastBlit > 0:
                 lastBlit = turn.turn
+                
+                console.printmap(turn.map)
+
                 
                 
                 
@@ -57,8 +60,8 @@ if __name__ == "__main__":
                 
                 # 'disappear' the entities in the viewport to prevent trails
                 # this must happen after the last screen flush of the turn
-                for actor in turn.actors:
-                    console.hide(actor)
+                #for actor in turn.actors:
+                #    console.hide(actor,turn.map)
                     
                 
             else:
