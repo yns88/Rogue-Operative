@@ -7,6 +7,7 @@ Created on Apr 26, 2011
 import libtcodpy as libtcod
 import entities
 import random
+import engine
 
 '''
     Abstract creature data type
@@ -29,8 +30,14 @@ class Creature(entities.Actor):
     If abs val of relx or rely are greater than 1 then the creature will essentially teleport
     '''
     def moveAct(self, relx, rely):
-        self.nextAction = lambda: self.place(self.x+relx, self.y+rely)
-        self.nextTurn += self.speed
+        if engine.map.isBlocked(self.x+relx,self.y+rely):
+            self.nextAction = lambda: 0
+            self.nextTurn += self.speed
+            return "You bump your head into the wall"
+        
+        else:
+            self.nextAction = lambda: self.place(self.x+relx, self.y+rely)
+            self.nextTurn += self.speed
         
     def wander(self):
         self.moveAct(random.randint(-1,1),random.randint(-1,1))
@@ -46,8 +53,9 @@ class Orc(Creature):
     
     def act(self, turn):
         if turn == self.nextTurn:
-            self.wander()
             self.nextAction()
+            self.wander()
+            
         
     def __init__(self,x,y):
         self.x = x
@@ -59,8 +67,9 @@ class Bat(Creature):
     
     def act(self, turn):
         if turn == self.nextTurn:
-            self.wander()
             self.nextAction()
+            self.wander()
+            
         
     def __init__(self,x,y):
         self.x = x

@@ -20,6 +20,9 @@ lastBlit = -20
 
 if __name__ == "__main__":
     
+    map = engine.initmap(console.GAME_WIDTH,console.GAME_HEIGHT)
+    console.printmap(map)
+    
     #   main game loop
     while not libtcod.console_is_window_closed():
     
@@ -28,20 +31,15 @@ if __name__ == "__main__":
         packet = engine.play(key)
         
         for turn in packet:
-		    
-			# print FPS
+            
+            # print FPS
             console.showfps()
             
             # screen blits a maximum of once per 10 turns
             # TO DO: find a way to do this without "munching" outlier actions
             if turn.turn - lastBlit > 0:
                 lastBlit = turn.turn
-                
-                console.printmap(turn.map)
 
-                
-                
-                
                 # update the viewport
                 for actor in turn.actors:
                     console.show(actor)
@@ -50,8 +48,8 @@ if __name__ == "__main__":
                 
                 # update the message port
                 for msg in turn.msgs:
-					console.addmessage(msg)
-				
+                    console.addmessage(msg)
+
                 console.showmessages(libtcod.light_orange)
                     
                 console.blit(console.message)
@@ -60,8 +58,8 @@ if __name__ == "__main__":
                 
                 # 'disappear' the entities in the viewport to prevent trails
                 # this must happen after the last screen flush of the turn
-                #for actor in turn.actors:
-                #    console.hide(actor,turn.map)
+                for actor in turn.actors:
+                    console.hide(actor,turn.map)
                     
                 
             else:

@@ -42,9 +42,9 @@ class map:
 			x = 0
 			for c in line:
 				if c == '#':
-					self.setTile(x,y,(1,random.randint(0,20)))
+					self.setTile(x,y,(1,random.randint(0,15)))
 				elif c == ' ':
-					self.setTile(x,y,(0,0))
+					self.setTile(x,y,(0,random.randint(0,5)))
 				else:
 					self.setTile(x,y,(-1,0))
 				x = x + 1
@@ -55,3 +55,9 @@ class map:
 	
 	def getTile(self,x,y):
 		return self.tiles[(x,y)]
+
+	def isBlocked(self,x,y):
+		if self.tiles[(x,y)][0] == 0:
+			return False
+		else:
+			return True

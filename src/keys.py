@@ -35,35 +35,35 @@ def handle_keys(key, player):
     
     # up
     if check_key_pressed(UP):
-        player.moveAct(0,-1)
+        return player.moveAct(0,-1)
     
     # down
     elif check_key_pressed(DOWN):
-        player.moveAct(0,1)
+        return player.moveAct(0,1)
     
     # left
     elif check_key_pressed(LEFT):
-        player.moveAct(-1,0)
+        return player.moveAct(-1,0)
     
     # right
     elif check_key_pressed(RIGHT):
-        player.moveAct(1,0)
+        return player.moveAct(1,0)
     
     # upleft
     elif check_key_pressed(UPLEFT):
-        player.moveAct(-1,-1)
+        return player.moveAct(-1,-1)
     
     # upright
     elif check_key_pressed(UPRIGHT):
-        player.moveAct(1,-1)
+        return player.moveAct(1,-1)
         
     # downleft
     elif check_key_pressed(DOWNLEFT):
-        player.moveAct(-1,1)
+        return player.moveAct(-1,1)
         
     # downright
     elif check_key_pressed(DOWNRIGHT):
-        player.moveAct(1,1)
+        return player.moveAct(1,1)
 
     elif check_key_pressed(ESCAPE):
         sys.exit(0)
