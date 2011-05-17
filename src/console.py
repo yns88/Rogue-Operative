@@ -27,11 +27,11 @@ GAME_HEIGHT = 35
 MSG_WIDTH = GAME_WIDTH
 MSG_HEIGHT = SCREEN_HEIGHT - GAME_HEIGHT - 1
 
-LIMIT_FPS = 60
+LIMIT_FPS = 90
 
 
 
-font = os.path.join('data', 'fonts', 'dejavu10x10_gs_tc.png')
+font = os.path.join('data', 'fonts', 'dejavu12x12_gs_tc.png')
 libtcod.console_set_custom_font(font, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
 
@@ -101,8 +101,9 @@ def applyval(color, value):
 def show(thing):
     libtcod.console_put_char(viewport.con, thing.x, thing.y, thing.char)
 
-def hide(thing):
-    libtcod.console_put_char(viewport.con, thing.x, thing.y, ' ')
+def hide(thing, map):
+    tile = tiletochar(map.getTile(thing.x,thing.y))
+    libtcod.console_put_char_ex(viewport.con, thing.x, thing.y, tile[0],tile[1], tile[2])
 
 def blit(console, ffade=1.0, bfade=1.0):
     libtcod.console_blit(console.con, 0, 0, console.width, console.height, 0, console.x, console.y, ffade, bfade)
@@ -123,7 +124,7 @@ def tiletochar(tuple):
 	
 	
 	if tuple[0] == 0:
-		return ' ', libtcod.white, applyval(libtcod.desaturated_orange,-20)
+		return ' ', libtcod.white, applyval(libtcod.desaturated_orange,tuple[1])
 	elif tuple[0] == 1:
 		return ' ', libtcod.white, applyval(libtcod.dark_sepia,tuple[1])
 	else: 

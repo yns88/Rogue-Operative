@@ -16,7 +16,7 @@ class player(creatures.Creature):
     speed = 100
     
     def __init__(self):
-        self.x = 10
+        self.x = 9
         self.y = 10
 
     def act(self, turn):

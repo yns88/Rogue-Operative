@@ -27,7 +27,13 @@ orc = creatures.Orc(10,10)
 bat = creatures.Bat(15,15)
 actors = [player,orc,bat]  # player is not in the list of actors, but is always a relevant actor
 
-map = map.map(55,35)
+
+
+
+def initmap(width,height):
+    global map
+    map = map.map(width,height)
+    return map
 
 def play(key):
     global curTurn,minTurn,player,actors
@@ -65,7 +71,7 @@ def play(key):
         
         
     
-    # if the player can act now, do so    
+    # if the player can act now, do so
     player.act(curTurn)
     turns.append(turn(map,actors,[msg],curTurn))
     
