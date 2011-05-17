@@ -31,7 +31,7 @@ LIMIT_FPS = 90
 
 
 
-font = os.path.join('data', 'fonts', 'dejavu16x16_gs_tc.png')
+font = os.path.join('data', 'fonts', 'dejavu12x12_gs_tc.png')
 libtcod.console_set_custom_font(font, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
 
