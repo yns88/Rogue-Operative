@@ -1,7 +1,22 @@
 '''
 Created on Apr 25, 2011
 
-@author: yns88
+    Rogue Operative - A Roguelike Espionage Game
+    Copyright (C) 2011  yns88 <yns088@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 '''
 
 import libtcodpy as libtcod
@@ -15,6 +30,23 @@ import copy
 import map
 
 
+class turn:
+    def __init__(self, map, actors=[], msgs=[], turn=0):
+        self.actors = actors
+        self.msgs = msgs
+        self.turn = turn
+        self.map = map         
+        
+        
+class fov:
+    def __init__(self,width,height,algo=libtcod.FOV_PERMISSIVE_3,light_walls=True,radius=8):
+            self.algo = algo
+            self.light_walls = light_walls
+            self.radius = radius
+            self.fovmap = libtcod.map_new(width, height)
+
+
+
 '''
 Declaration of base variables
 '''
@@ -25,15 +57,26 @@ player = player()   # the player character
 
 orc = creatures.Orc(10,10)
 bat = creatures.Bat(15,15)
-actors = [player,orc,bat]  # player is not in the list of actors, but is always a relevant actor
+bat2 = creatures.Bat(8,8)
+actors = [player,orc,bat,bat2]  # player is not in the list of actors, but is always a relevant actor
 
 
+gamemap = map.map()
 
+fov = fov(gamemap.width,gamemap.height)
 
-def initmap(width,height):
-    global map
-    map = map.map(width,height)
-    return map
+for x in range(gamemap.width):
+    for y in range(gamemap.height):
+        libtcod.map_set_properties(fov.fovmap, x, y, not gamemap.isBlocked(x, y), not gamemap.isBlocked(x, y))
+        
+def fov_recompute():
+    libtcod.map_compute_fov(fov.fovmap, player.x, player.y,fov.radius, fov.light_walls, fov.algo)
+    for x in range(gamemap.width):
+        for y in range(gamemap.height):
+            visible = libtcod.map_is_in_fov(fov.fovmap, x, y)
+            gamemap.setVisible(x,y,visible)
+            if visible:
+                gamemap.setExplored(x,y,True)
 
 def play(key):
     global curTurn,minTurn,player,actors
@@ -62,8 +105,13 @@ def play(key):
 
             if curTurn < item.nextTurn < minTurn:
                 minTurn = item.nextTurn
+                
+        visActors = copy.deepcopy(actors)
+        for i in range(len(actors)-1,0,-1):
+            if not gamemap.visible[(actors[i].x,actors[i].y)]:
+                visActors.pop(i)
         
-        turns.append(turn(map,copy.deepcopy(actors),copy.deepcopy(msgs),curTurn))
+        turns.append(turn(gamemap,visActors,copy.deepcopy(msgs),curTurn))
         print curTurn
         
         curTurn = minTurn
@@ -73,20 +121,16 @@ def play(key):
     
     # if the player can act now, do so
     player.act(curTurn)
-    turns.append(turn(map,actors,[msg],curTurn))
+    
+    visActors = copy.deepcopy(actors)
+    for i in range(len(actors)-1,0,-1):
+        if not gamemap.visible[(actors[i].x,actors[i].y)]:
+            visActors.pop(i)
+    
+    turns.append(turn(gamemap,visActors,[msg],curTurn))
     
     return turns
     
 
-class turn:
-    def __init__(self, map, actors=[], msgs=[], turn=0):
-        self.actors = actors
-        self.msgs = msgs
-        self.turn = turn
-        self.map = map         
-        
-        
-        
-            
-            
+
             

@@ -3,7 +3,22 @@ Created on May 12, 2011
 
 This module attempts to encapsulate much of the really ugly libtcod.console* library calls
 
-@author: yns88
+    Rogue Operative - A Roguelike Espionage Game
+    Copyright (C) 2011  yns88 <yns088@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 '''
 
 import libtcodpy as libtcod
@@ -102,7 +117,7 @@ def show(thing):
     libtcod.console_put_char(viewport.con, thing.x, thing.y, thing.char)
 
 def hide(thing, map):
-    tile = tiletochar(map.getTile(thing.x,thing.y))
+    tile = tiletochar(map.getTile(thing.x,thing.y), map.visible[thing.x,thing.y])
     libtcod.console_put_char_ex(viewport.con, thing.x, thing.y, tile[0],tile[1], tile[2])
 
 def blit(console, ffade=1.0, bfade=1.0):
@@ -115,17 +130,29 @@ def showfps():
     
     
 def printmap(map):
-	for x in range(0,map.width):
-		for y in range(0,map.height):
-			tile = tiletochar(map.getTile(x,y))
-			libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
-			
-def tiletochar(tuple):
-	
-	
-	if tuple[0] == 0:
-		return ' ', libtcod.white, applyval(libtcod.desaturated_orange,tuple[1])
-	elif tuple[0] == 1:
-		return ' ', libtcod.white, applyval(libtcod.dark_sepia,tuple[1])
-	else: 
-		return 'x', libtcod.pink, libtcod.black
+    for x in range(0,min(GAME_WIDTH,map.width)):
+        for y in range(0,min(GAME_HEIGHT,map.height)):
+            if map.explored[(x,y)]:
+                if map.visible[(x,y)]:
+                    tile = tiletochar(map.getTile(x,y),True)
+                else:
+                    tile = tiletochar(map.getTile(x,y),False)
+                libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
+
+def tiletochar(tuple,visible):
+    fg = libtcod.pink
+    bg = libtcod.black
+    if tuple[0] == 0:
+        if visible:
+            bg = libtcod.desaturated_orange
+        else:
+            bg = libtcod.black
+        return ' ', fg, applyval(bg,tuple[1])
+    elif tuple[0] == 1:
+        if visible:
+            bg = libtcod.dark_sepia
+        else:
+            bg = libtcod.dark_blue
+        return ' ', fg, applyval(bg,tuple[1])
+    else: 
+        return 'x', fg, bg
