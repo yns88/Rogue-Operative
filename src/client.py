@@ -27,7 +27,7 @@ import console
     obviously once real client/server code is in you won't be 
     importing the engine's source
 '''
-import engine       
+import engine 
 
 # the turn at which the last screen update occurred
 # initialized to a silly number
@@ -45,16 +45,23 @@ if __name__ == "__main__":
         packet = engine.play(key)
         
         for turn in packet:
-            
-            console.printmap(turn.map)
+			
+			
             
             # print FPS
             console.showfps()
             
             # screen blits a maximum of once per 10 turns
             # TO DO: find a way to do this without "munching" outlier actions
+            
+            
             if turn.turn - lastBlit > 0:
                 lastBlit = turn.turn
+
+				# only update the map if it's changed
+                if turn.viewchanged:
+                    console.printmap(turn.map)
+                    console.hideDisappeared(turn.map)
 
                 # update the viewport
                 for actor in turn.actors:
@@ -76,6 +83,9 @@ if __name__ == "__main__":
                 # this must happen after the last screen flush of the turn
                 for actor in turn.actors:
                     console.hide(actor,turn.map)
+                    
+                
+                    
                     
                 
             else:

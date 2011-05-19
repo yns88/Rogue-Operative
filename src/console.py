@@ -134,12 +134,14 @@ def showfps():
     
 def printmap(map):
     for x,y in map.keys:
-        if map.explored[(x,y)]:
-            if map.getVisible(x,y):
-                tile = tiletochar(map.getTile(x,y),True)
-            else:
-                tile = tiletochar(map.getTile(x,y),False)
+        if map.explored[(x,y)] and map.getVisible(x,y):
+            tile = tiletochar(map.getTile(x,y),True)
             libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
+            
+def hideDisappeared(map):
+    for x,y in map.disappeared:
+		tile = tiletochar(map.getTile(x,y),False)
+		libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
 
 def tiletochar(tuple,visible):
     fg = libtcod.pink
@@ -148,13 +150,13 @@ def tiletochar(tuple,visible):
         if visible:
             bg = libtcod.desaturated_orange
         else:
-            bg = libtcod.black
+            bg = applyval(libtcod.dark_blue,100)
         return ' ', fg, applyval(bg,tuple[1])
     elif tuple[0] == 1:
         if visible:
             bg = libtcod.dark_sepia
         else:
-            bg = libtcod.dark_blue
+            bg = applyval(libtcod.dark_blue,120)
         return ' ', fg, applyval(bg,tuple[1])
     else: 
         return 'x', fg, bg

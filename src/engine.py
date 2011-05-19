@@ -31,19 +31,23 @@ import map
 
 
 class turn:
-    def __init__(self, map, actors=[], msgs=[], turn=0):
+    def __init__(self, map, actors=[], msgs=[], turn=0, viewchanged=False):
         self.actors = actors
         self.msgs = msgs
         self.turn = turn
-        self.map = map         
+        self.map = map
+        self.viewchanged = viewchanged
         
         
 class fov:
-    def __init__(self,width,height,algo=libtcod.FOV_PERMISSIVE_3,light_walls=True,radius=8):
+    def __init__(self,width,height,algo=libtcod.FOV_RESTRICTIVE,light_walls=True,radius=10):
             self.algo = algo
             self.light_walls = light_walls
             self.radius = radius
             self.fovmap = libtcod.map_new(width, height)
+      
+    def setRadius(self,r):
+		self.radius = radius
 
 
 
@@ -70,13 +74,18 @@ for x in range(gamemap.width):
         libtcod.map_set_properties(fov.fovmap, x, y, not gamemap.isBlocked(x, y), not gamemap.isBlocked(x, y))
         
 def fov_recompute():
+    gamemap.clearDisappear()
     libtcod.map_compute_fov(fov.fovmap, player.x, player.y,fov.radius, fov.light_walls, fov.algo)
     for x in range(gamemap.width):
         for y in range(gamemap.height):
             visible = libtcod.map_is_in_fov(fov.fovmap, x, y)
-            gamemap.setVisible(x,y,visible)
             if visible:
+                gamemap.setVisible(x,y,True)
                 gamemap.setExplored(x,y,True)
+            else:
+				if gamemap.getVisible(x,y):
+					gamemap.disappear(x,y)
+				gamemap.setVisible(x,y,False)
 
 def play(key):
     global curTurn,minTurn,player,actors
@@ -120,6 +129,7 @@ def play(key):
 				partmap.setVisible(x,y,True)
 				partmap.explored[(x,y)] = gamemap.explored[(x,y)]
 				partmap.keys.append((x,y))
+				partmap.disappear = gamemap.disappear
 
         turns.append(turn(partmap,visActors,copy.deepcopy(msgs),curTurn))
         print curTurn
@@ -147,8 +157,9 @@ def play(key):
 			partmap.setVisible(x,y,True)
 			partmap.explored[(x,y)] = gamemap.explored[(x,y)]
 			partmap.keys.append((x,y))
+			partmap.disappear = gamemap.disappear
     
-    turns.append(turn(gamemap,visActors,[msg],curTurn))
+    turns.append(turn(gamemap,visActors,[msg],curTurn,True))
     
     return turns
     

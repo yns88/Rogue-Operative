@@ -53,6 +53,7 @@ class map:
 		self.visible = dict()
 		self.explored = dict()
 		self.keys = []
+		self.disappeared = []
 		
 		if format is not None:
 
@@ -70,7 +71,7 @@ class map:
 					if c == '#':
 						self.setTile(x,y,(1,random.randint(0,15)))
 					elif c == ' ':
-						self.setTile(x,y,(0,random.randint(0,5)))
+						self.setTile(x,y,(0,random.randint(-15,-10)))
 					else:
 						self.setTile(x,y,(-1,0))
 					x = x + 1
@@ -104,3 +105,9 @@ class map:
 	
 	def setExplored(self,x,y,vis):
 		self.explored[(x,y)] = vis
+		
+	def disappear(self,x,y):
+		self.disappeared.append((x,y))
+		
+	def clearDisappear(self):
+		self.disappeared = []
