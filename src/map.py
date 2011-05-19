@@ -44,7 +44,7 @@ smap = ['##############################################',
 
 class map:
 	global smap
-	def __init__(self,w=len(smap[0]),h=len(smap),format=smap):
+	def __init__(self,format=smap,w=len(smap[0]),h=len(smap)):
 		self.width = w
 		self.height = h
 		
@@ -52,31 +52,37 @@ class map:
 		self.tiles = dict()
 		self.visible = dict()
 		self.explored = dict()
+		self.keys = []
+		
+		if format is not None:
 
-		for i in range(w):
-			for j in range(h):
-				self.setTile(i,j,(2,0))
-				self.visible[(i,j)] = False
-				self.explored[(i,j)] = False
+			for i in range(w):
+				for j in range(h):
+					self.setTile(i,j,(2,0))
+					# self.visible[(i,j)] = False
+					self.explored[(i,j)] = False
+					self.keys.append((i,j))
 
-		y = 0
-		for line in smap:
-			x = 0
-			for c in line:
-				if c == '#':
-					self.setTile(x,y,(1,random.randint(0,15)))
-				elif c == ' ':
-					self.setTile(x,y,(0,random.randint(0,5)))
-				else:
-					self.setTile(x,y,(-1,0))
-				x = x + 1
-			y = y + 1
+			y = 0
+			for line in smap:
+				x = 0
+				for c in line:
+					if c == '#':
+						self.setTile(x,y,(1,random.randint(0,15)))
+					elif c == ' ':
+						self.setTile(x,y,(0,random.randint(0,5)))
+					else:
+						self.setTile(x,y,(-1,0))
+					x = x + 1
+				y = y + 1
 		
 	def setTile(self,x,y,tilecode):
 		self.tiles[(x,y)] = tilecode
 	
 	def getTile(self,x,y):
-		return self.tiles[(x,y)]
+		if (x,y) in self.keys:
+			return self.tiles[(x,y)]
+		return (0,0)
 
 	def isBlocked(self,x,y):
 		if self.tiles[(x,y)][0] == 0:
@@ -85,7 +91,16 @@ class map:
 			return True
 		
 	def setVisible(self,x,y,visible):
-		self.visible[(x,y)] = visible
+		if visible:
+			self.visible[(x,y)] = True
+		elif (x,y) in self.visible:
+			del self.visible[(x,y)]
+			
+	def getVisible(self,x,y):
+		if (x,y) in self.visible:
+			return True
+		else:
+			return False
 	
 	def setExplored(self,x,y,vis):
 		self.explored[(x,y)] = vis

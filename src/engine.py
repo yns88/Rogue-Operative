@@ -108,10 +108,20 @@ def play(key):
                 
         visActors = copy.deepcopy(actors)
         for i in range(len(actors)-1,0,-1):
-            if not gamemap.visible[(actors[i].x,actors[i].y)]:
+            if not gamemap.getVisible(actors[i].x,actors[i].y):
                 visActors.pop(i)
-        
-        turns.append(turn(gamemap,visActors,copy.deepcopy(msgs),curTurn))
+                
+        partmap = map.map(None)
+        for item in gamemap.visible:
+			x = item[0]
+			y = item[1]
+			if gamemap.getVisible(x,y):
+				partmap.setTile(x,y,gamemap.tiles[(x,y)])
+				partmap.setVisible(x,y,True)
+				partmap.explored[(x,y)] = gamemap.explored[(x,y)]
+				partmap.keys.append((x,y))
+
+        turns.append(turn(partmap,visActors,copy.deepcopy(msgs),curTurn))
         print curTurn
         
         curTurn = minTurn
@@ -124,8 +134,19 @@ def play(key):
     
     visActors = copy.deepcopy(actors)
     for i in range(len(actors)-1,0,-1):
-        if not gamemap.visible[(actors[i].x,actors[i].y)]:
+        if not gamemap.getVisible(actors[i].x,actors[i].y):
             visActors.pop(i)
+            
+     
+    partmap = map.map(None)
+    for item in gamemap.visible:
+		x = item[0]
+		y = item[1]
+		if gamemap.getVisible(x,y):
+			partmap.setTile(x,y,gamemap.tiles[(x,y)])
+			partmap.setVisible(x,y,True)
+			partmap.explored[(x,y)] = gamemap.explored[(x,y)]
+			partmap.keys.append((x,y))
     
     turns.append(turn(gamemap,visActors,[msg],curTurn))
     

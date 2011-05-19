@@ -117,8 +117,11 @@ def show(thing):
     libtcod.console_put_char(viewport.con, thing.x, thing.y, thing.char)
 
 def hide(thing, map):
-    tile = tiletochar(map.getTile(thing.x,thing.y), map.visible[thing.x,thing.y])
-    libtcod.console_put_char_ex(viewport.con, thing.x, thing.y, tile[0],tile[1], tile[2])
+	if (thing.x,thing.y) in map.keys:
+		tile = tiletochar(map.getTile(thing.x,thing.y), map.visible[thing.x,thing.y])
+	else:
+		tile = tiletochar((0,0),False)
+	libtcod.console_put_char_ex(viewport.con, thing.x, thing.y, tile[0],tile[1], tile[2])
 
 def blit(console, ffade=1.0, bfade=1.0):
     libtcod.console_blit(console.con, 0, 0, console.width, console.height, 0, console.x, console.y, ffade, bfade)
@@ -126,18 +129,17 @@ def blit(console, ffade=1.0, bfade=1.0):
     
 def showfps():
     # print FPS
-    libtcod.console_print_ex(0,SCREEN_WIDTH-1,SCREEN_HEIGHT-1, libtcod.BKGND_NONE, libtcod.RIGHT, 'FPS:' + libtcod.sys_get_fps().__str__())
+    libtcod.console_print_ex(0,SCREEN_WIDTH-1,0, libtcod.BKGND_NONE, libtcod.RIGHT, 'FPS:' + libtcod.sys_get_fps().__str__())
     
     
 def printmap(map):
-    for x in range(0,min(GAME_WIDTH,map.width)):
-        for y in range(0,min(GAME_HEIGHT,map.height)):
-            if map.explored[(x,y)]:
-                if map.visible[(x,y)]:
-                    tile = tiletochar(map.getTile(x,y),True)
-                else:
-                    tile = tiletochar(map.getTile(x,y),False)
-                libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
+    for x,y in map.keys:
+        if map.explored[(x,y)]:
+            if map.getVisible(x,y):
+                tile = tiletochar(map.getTile(x,y),True)
+            else:
+                tile = tiletochar(map.getTile(x,y),False)
+            libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
 
 def tiletochar(tuple,visible):
     fg = libtcod.pink
