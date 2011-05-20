@@ -83,7 +83,6 @@ if __name__ == "__main__":
                 # this must happen after the last screen flush of the turn
                 for actor in turn.actors:
                     console.hide(actor,turn.map)
-                    
                 
                     
                     

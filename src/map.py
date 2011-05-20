@@ -17,6 +17,7 @@
 
 '''
 
+import libtcodpy as libtcod
 import random
 
 smap = ['##############################################',
@@ -52,6 +53,8 @@ class map:
 		self.tiles = dict()
 		self.visible = dict()
 		self.explored = dict()
+		self.brightness = dict()
+		self.colors = dict()
 		self.keys = []
 		self.disappeared = []
 		
@@ -60,7 +63,6 @@ class map:
 			for i in range(w):
 				for j in range(h):
 					self.setTile(i,j,(2,0))
-					# self.visible[(i,j)] = False
 					self.explored[(i,j)] = False
 					self.keys.append((i,j))
 
@@ -69,9 +71,9 @@ class map:
 				x = 0
 				for c in line:
 					if c == '#':
-						self.setTile(x,y,(1,random.randint(0,15)))
+						self.setTile(x,y,(1,random.randint(115,120)))
 					elif c == ' ':
-						self.setTile(x,y,(0,random.randint(-15,-10)))
+						self.setTile(x,y,(0,random.randint(100,105)))
 					else:
 						self.setTile(x,y,(-1,0))
 					x = x + 1
@@ -111,3 +113,19 @@ class map:
 		
 	def clearDisappear(self):
 		self.disappeared = []
+		
+	def addBrightness(self,x,y,val):
+		if (x,y) in self.brightness:
+			self.brightness[(x,y)] += val
+		else:
+			self.brightness[(x,y)] = val
+
+	def getBrightness(self,x,y):
+		if (x,y) in self.brightness:
+			return self.brightness[(x,y)]
+		return 0
+		
+	def getColor(self,x,y):
+		if (x,y) in self.colors:
+			return self.colors[(x,y)]
+		return libtcod.black

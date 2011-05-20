@@ -19,6 +19,8 @@ Created on Apr 26, 2011
 
 '''
 
+import libtcodpy as libtcod
+
 class Actor:
     nextTurn = 0
     
@@ -29,7 +31,21 @@ class Light(Effect):
     brightness = 0
     radius = 0
     
-    def __init__(self,bright,rad):
-        self.brightness = bright
-        self.radius = rad
+    def __init__(self,x,y,bright,radius,color=libtcod.orange):
+		self.x = x
+		self.y = y
+		self.brightness = bright
+		self.radius = radius
+		self.color = color
         
+    def getBrightness(self,x,y):
+		# Calculate square of the distance to the point
+		# must be at least 1
+		
+		sqr_dist = max(1,((x - self.x)**2 + (y - self.y)**2))
+		
+		value1 = 1.0 / (1.0 + sqr_dist/2)
+		value2 = value1 - 1.0/(1.0+self.radius**2);
+		value3 = value2 / (1.0 - 1.0/(1.0+self.radius**2));
+		
+		return value3 * self.brightness

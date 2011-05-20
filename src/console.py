@@ -34,10 +34,10 @@ class console:
         self.con = libtcod.console_new(self.width,self.height)
 
 SCREEN_WIDTH = 80
-SCREEN_HEIGHT = 50
+SCREEN_HEIGHT = 45
 
 GAME_WIDTH = 55
-GAME_HEIGHT = 35
+GAME_HEIGHT = 30
 
 MSG_WIDTH = GAME_WIDTH
 MSG_HEIGHT = SCREEN_HEIGHT - GAME_HEIGHT - 1
@@ -51,7 +51,7 @@ libtcod.console_set_custom_font(font, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT
 
 
 
-libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'python/libtcod tutorial', False)
+libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'Rogue Operative', False)
 libtcod.sys_set_fps(LIMIT_FPS)
 libtcod.sys_set_renderer(libtcod.RENDERER_SDL) # stick with SDL for now until other renderers are more stable
 
@@ -102,14 +102,17 @@ def showmessages(color=libtcod.white):
             libtcod.console_print(message.con, 0, MSG_HEIGHT-i, msghist[msgindex])
     
 
-def applyval(color, value):
+def applyval(color, value, lightcolor = libtcod.black):
     newcolor = libtcod.Color(0,0,0)
     if color.r - value > 0:
         newcolor.r = color.r - value
+        newcolor.r += lightcolor.r
     if color.g - value > 0:
         newcolor.g = color.g - value
+        newcolor.g += lightcolor.g
     if color.b - value > 0:
         newcolor.b = color.b - value
+        newcolor.b += lightcolor.b
     
     return newcolor
     
@@ -118,9 +121,9 @@ def show(thing):
 
 def hide(thing, map):
 	if (thing.x,thing.y) in map.keys:
-		tile = tiletochar(map.getTile(thing.x,thing.y), map.visible[thing.x,thing.y])
+		tile = tiletochar(map.getTile(thing.x,thing.y),map.getBrightness(x,y),map.visible[thing.x,thing.y],map.getColor(x,y))
 	else:
-		tile = tiletochar((0,0),False)
+		tile = tiletochar((0,0),map.getBrightness(x,y),False)
 	libtcod.console_put_char_ex(viewport.con, thing.x, thing.y, tile[0],tile[1], tile[2])
 
 def blit(console, ffade=1.0, bfade=1.0):
@@ -135,28 +138,28 @@ def showfps():
 def printmap(map):
     for x,y in map.keys:
         if map.explored[(x,y)] and map.getVisible(x,y):
-            tile = tiletochar(map.getTile(x,y),True)
+            tile = tiletochar(map.getTile(x,y),map.getBrightness(x,y),True,map.getColor(x,y))
             libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
             
 def hideDisappeared(map):
     for x,y in map.disappeared:
-		tile = tiletochar(map.getTile(x,y),False)
+		tile = tiletochar(map.getTile(x,y),0,False)
 		libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
 
-def tiletochar(tuple,visible):
+def tiletochar(tuple,brightness,visible,lightcolor=libtcod.black):
     fg = libtcod.pink
     bg = libtcod.black
     if tuple[0] == 0:
         if visible:
-            bg = libtcod.desaturated_orange
+            bg = applyval(libtcod.gray,int((-1 * brightness)),lightcolor)
         else:
-            bg = applyval(libtcod.dark_blue,100)
+            bg = applyval(libtcod.dark_blue,60)
         return ' ', fg, applyval(bg,tuple[1])
     elif tuple[0] == 1:
         if visible:
-            bg = libtcod.dark_sepia
+            bg = applyval(libtcod.gray,int((-1 * brightness)),lightcolor)
         else:
-            bg = applyval(libtcod.dark_blue,120)
+            bg = applyval(libtcod.dark_blue,30)
         return ' ', fg, applyval(bg,tuple[1])
     else: 
         return 'x', fg, bg

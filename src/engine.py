@@ -23,6 +23,7 @@ import libtcodpy as libtcod
 import keys
 # import os
 # import sys
+import entities
 import creatures
 # from console import *   # import console variable definitions into global
 from player import *    # import player definition into global
@@ -40,7 +41,7 @@ class turn:
         
         
 class fov:
-    def __init__(self,width,height,algo=libtcod.FOV_RESTRICTIVE,light_walls=True,radius=10):
+    def __init__(self,width,height,algo=libtcod.FOV_RESTRICTIVE,light_walls=True,radius=15):
             self.algo = algo
             self.light_walls = light_walls
             self.radius = radius
@@ -63,7 +64,10 @@ orc = creatures.Orc(10,10)
 bat = creatures.Bat(15,15)
 bat2 = creatures.Bat(8,8)
 actors = [player,orc,bat,bat2]  # player is not in the list of actors, but is always a relevant actor
+lights = []
 
+testlight = entities.Light(34,7,50,10)
+lights.append(testlight)
 
 gamemap = map.map()
 
@@ -86,6 +90,19 @@ def fov_recompute():
 				if gamemap.getVisible(x,y):
 					gamemap.disappear(x,y)
 				gamemap.setVisible(x,y,False)
+				
+def lights_recompute():
+	gamemap.brightness = dict()
+	for light in lights:
+		libtcod.map_compute_fov(fov.fovmap, light.x, light.y, light.radius, fov.light_walls, fov.algo)
+		for x in range(light.x-light.radius,light.x+light.radius):
+			for y in range(light.y-light.radius,light.y+light.radius):
+				if libtcod.map_is_in_fov(fov.fovmap,x,y):
+					gamemap.addBrightness(x,y,light.getBrightness(x,y))
+					gamemap.colors[(x,y)] = light.color # change this later
+				
+lights_recompute()
+			
 
 def play(key):
     global curTurn,minTurn,player,actors
@@ -130,6 +147,8 @@ def play(key):
 				partmap.explored[(x,y)] = gamemap.explored[(x,y)]
 				partmap.keys.append((x,y))
 				partmap.disappear = gamemap.disappear
+				partmap.brightness[(x,y)] = gamemap.getBrightness(x,y)
+				partmap.colors = gamemap.colors
 
         turns.append(turn(partmap,visActors,copy.deepcopy(msgs),curTurn))
         print curTurn
@@ -158,6 +177,8 @@ def play(key):
 			partmap.explored[(x,y)] = gamemap.explored[(x,y)]
 			partmap.keys.append((x,y))
 			partmap.disappear = gamemap.disappear
+			partmap.brightness[(x,y)] = gamemap.getBrightness(x,y)
+			partmap.colors = gamemap.colors
     
     turns.append(turn(gamemap,visActors,[msg],curTurn,True))
     
