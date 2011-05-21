@@ -23,7 +23,7 @@ This module attempts to encapsulate much of the really ugly libtcod.console* lib
 
 import libtcodpy as libtcod
 import os
-# import random
+import random
 
 class console:
     def __init__(self,width,height,x,y):
@@ -42,14 +42,14 @@ GAME_HEIGHT = 30
 MSG_WIDTH = GAME_WIDTH
 MSG_HEIGHT = SCREEN_HEIGHT - GAME_HEIGHT - 1
 
-LIMIT_FPS = 90
+LIMIT_FPS = 30
 
-
+noise1d = libtcod.noise_new(1)
 
 font = os.path.join('data', 'fonts', 'dejavu12x12_gs_tc.png')
 libtcod.console_set_custom_font(font, libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
-
+torchconst = 0.0
 
 libtcod.console_init_root(SCREEN_WIDTH, SCREEN_HEIGHT, 'Rogue Operative', False)
 libtcod.sys_set_fps(LIMIT_FPS)
@@ -130,9 +130,13 @@ def showfps():
     
     
 def printmap(map):
+    global torchconst
+    torchconst += 0.2
+    flicker = libtcod.noise_get(noise1d,[torchconst]) * 0.1
+	
     for x,y in map.keys:
         if map.explored[(x,y)] and map.getVisible(x,y):
-            tile = tiletochar(map.getTile(x,y),map.getBrightness(x,y),True,map.getColor(x,y))
+            tile = tiletochar(map.getTile(x,y),map.getBrightness(x,y) - flicker,True,map.getColor(x,y))
             libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
             
 def hideDisappeared(map):
