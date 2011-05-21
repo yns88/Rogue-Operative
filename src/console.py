@@ -95,24 +95,18 @@ def showmessages(color=libtcod.white):
     for i in range(1, MSG_HEIGHT):
         
         msgindex = len(msghist) - i
-        value = 15*(i-1)
+        value = -1 * (i * 0.05)
         
         if msgindex > 0:
             libtcod.console_set_default_foreground(message.con, applyval(color,value))
             libtcod.console_print(message.con, 0, MSG_HEIGHT-i, msghist[msgindex])
     
 
-def applyval(color, value, lightcolor = libtcod.black):
+def applyval(color, value, lightcolor = libtcod.white):
     newcolor = libtcod.Color(0,0,0)
-    if color.r - value > 0:
-        newcolor.r = color.r - value
-        newcolor.r += lightcolor.r
-    if color.g - value > 0:
-        newcolor.g = color.g - value
-        newcolor.g += lightcolor.g
-    if color.b - value > 0:
-        newcolor.b = color.b - value
-        newcolor.b += lightcolor.b
+    newcolor.r = min(255,max(0,color.r + int(value * lightcolor.r)))
+    newcolor.g = min(255,max(0,color.g + int(value * lightcolor.g)))
+    newcolor.b = min(255,max(0,color.b + int(value * lightcolor.b)))
     
     return newcolor
     
@@ -121,7 +115,7 @@ def show(thing):
 
 def hide(thing, map):
 	if (thing.x,thing.y) in map.keys:
-		tile = tiletochar(map.getTile(thing.x,thing.y),map.getBrightness(x,y),map.visible[thing.x,thing.y],map.getColor(x,y))
+		tile = tiletochar(map.getTile(thing.x,thing.y),map.getBrightness(thing.x,thing.y),map.visible[thing.x,thing.y],map.getColor(thing.x,thing.y))
 	else:
 		tile = tiletochar((0,0),map.getBrightness(x,y),False)
 	libtcod.console_put_char_ex(viewport.con, thing.x, thing.y, tile[0],tile[1], tile[2])
@@ -151,15 +145,15 @@ def tiletochar(tuple,brightness,visible,lightcolor=libtcod.black):
     bg = libtcod.black
     if tuple[0] == 0:
         if visible:
-            bg = applyval(libtcod.gray,int((-1 * brightness)),lightcolor)
+            bg = applyval(libtcod.black,brightness,lightcolor)
         else:
-            bg = applyval(libtcod.dark_blue,60)
+            bg = applyval(libtcod.dark_blue,-0.6)
         return ' ', fg, applyval(bg,tuple[1])
     elif tuple[0] == 1:
         if visible:
-            bg = applyval(libtcod.gray,int((-1 * brightness)),lightcolor)
+            bg = applyval(libtcod.black,brightness,lightcolor)
         else:
-            bg = applyval(libtcod.dark_blue,30)
+            bg = applyval(libtcod.dark_blue,-0.6)
         return ' ', fg, applyval(bg,tuple[1])
     else: 
         return 'x', fg, bg

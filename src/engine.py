@@ -66,8 +66,10 @@ bat2 = creatures.Bat(8,8)
 actors = [player,orc,bat,bat2]  # player is not in the list of actors, but is always a relevant actor
 lights = []
 
-testlight = entities.Light(34,7,50,10)
+testlight = entities.Light(37,7,50,10)
 lights.append(testlight)
+testlight2 = entities.Light(9,10,1,10)
+lights.append(testlight2)
 
 gamemap = map.map()
 
@@ -94,7 +96,7 @@ def fov_recompute():
 def lights_recompute():
 	gamemap.brightness = dict()
 	for light in lights:
-		libtcod.map_compute_fov(fov.fovmap, light.x, light.y, light.radius, fov.light_walls, fov.algo)
+		libtcod.map_compute_fov(fov.fovmap, light.x, light.y, light.radius, False, fov.algo)
 		for x in range(light.x-light.radius,light.x+light.radius):
 			for y in range(light.y-light.radius,light.y+light.radius):
 				if libtcod.map_is_in_fov(fov.fovmap,x,y):

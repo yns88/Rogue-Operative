@@ -44,8 +44,11 @@ class Light(Effect):
 		
 		sqr_dist = max(1,((x - self.x)**2 + (y - self.y)**2))
 		
-		value1 = 1.0 / (1.0 + sqr_dist/2)
-		value2 = value1 - 1.0/(1.0+self.radius**2);
-		value3 = value2 / (1.0 - 1.0/(1.0+self.radius**2));
+		value = 0.04 * self.radius**2 / max(1, sqr_dist)
+
 		
-		return value3 * self.brightness
+		# value1 = 1.0 / (1.0 + sqr_dist)
+		# value2 = value1 - 1.0/(1.0+self.radius**2);
+		# value3 = value2 / (1.0 - 1.0/(1.0+self.radius**2));
+		
+		return max(0,min(1,value))

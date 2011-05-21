@@ -71,9 +71,9 @@ class map:
 				x = 0
 				for c in line:
 					if c == '#':
-						self.setTile(x,y,(1,random.randint(115,120)))
+						self.setTile(x,y,(1,random.uniform(0.15,0.2)))
 					elif c == ' ':
-						self.setTile(x,y,(0,random.randint(100,105)))
+						self.setTile(x,y,(0,random.uniform(0.0,0.05)))
 					else:
 						self.setTile(x,y,(-1,0))
 					x = x + 1
