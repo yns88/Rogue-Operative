@@ -33,6 +33,7 @@ import engine
 # initialized to a silly number
 lastBlit = -20   
 lastTurn = None   
+realtime = True
 
 if __name__ == "__main__":
     
@@ -40,7 +41,10 @@ if __name__ == "__main__":
 	while not libtcod.console_is_window_closed():
 		global lastTurn
     
-		key = libtcod.console_check_for_keypress()
+		if realtime:
+			key = libtcod.console_check_for_keypress()
+		else:
+			key = libtcod.console_wait_for_keypress(True)
 		
 		if lastTurn is not None:
 			console.printmap(lastTurn.map)
