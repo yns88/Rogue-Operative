@@ -31,78 +31,87 @@ import engine
 
 # the turn at which the last screen update occurred
 # initialized to a silly number
-lastBlit = -20   
+lastBlit = -20
 lastTurn = None   
 realtime = True
 
 if __name__ == "__main__":
     
 	#   main game loop
-	while not libtcod.console_is_window_closed():
-		global lastTurn
+    while not libtcod.console_is_window_closed():
+        global lastTurn
     
-		if realtime:
-			key = libtcod.console_check_for_keypress()
-		else:
-			key = libtcod.console_wait_for_keypress(True)
+    
+        # if realtime rendering is turned off, then only update game screen on keypresses
+        if realtime:
+            key = libtcod.console_check_for_keypress()
+        else:
+            key = libtcod.console_wait_for_keypress(True)
 		
-		if lastTurn is not None:
-			console.printmap(lastTurn.map)
-			console.blit(console.viewport)
+        # update game screen based on the last turn
+        if lastTurn is not None:
+            console.printmap(lastTurn.map)
+            console.blit(console.viewport)
 			
-			for actor in turn.actors:
-				console.show(actor)
-			console.blit(console.viewport)
+            for actor in turn.actors:
+                console.show(actor)
+            console.blit(console.viewport)
 			
-			libtcod.console_flush()
+            libtcod.console_flush()
         
-		if key.vk != libtcod.KEY_NONE:
+        # when the player has pressed a key, query the engine
+        if key.vk != libtcod.KEY_NONE:
     
-			packet = engine.play(key)
+            packet = engine.play(key)
+            
+            turnNumbers = []
         
-			for turn in packet:
+            # now we go through each turn that the engine has sent us and render it to the player
+            for turn in packet:
 			
-				lastTurn = turn
+                turnNumbers.append(turn.turn)
+            
+                lastTurn = turn
             
 				# print FPS
-				console.showfps()
+                console.showfps()
             
 				# screen blits a maximum of once per 10 turns
 				# TO DO: find a way to do this without "munching" outlier actions
-				if turn.turn - lastBlit > 0:
-					lastBlit = turn.turn
+                if turn.turn - lastBlit > 0:
+                    lastBlit = turn.turn
 					
 					# only update the map if it's changed
-					if turn.viewchanged:
-						console.printmap(turn.map)
-						console.hideDisappeared(turn.map)
+                    if turn.viewchanged:
+                        console.printmap(turn.map)
+                        console.hideDisappeared(turn.map)
 					
 					# update the viewport
-					for actor in turn.actors:
-						console.show(actor)
-					console.blit(console.viewport)
+                    for actor in turn.actors:
+                        console.show(actor)
+                    console.blit(console.viewport)
                 
                 
 					# update the message port
-					for msg in turn.msgs:
-						console.addmessage(msg)
-					console.showmessages(libtcod.light_orange)
+                    for msg in turn.msgs:
+                        console.addmessage(msg)
+                    console.showmessages(libtcod.light_orange)
                     
-					console.blit(console.message)
-					libtcod.console_flush()
+                    console.blit(console.message)
+                    libtcod.console_flush()
 				
 					# 'disappear' the entities in the viewport to prevent trails
 					# this must happen after the last screen flush of the turn
-					for actor in turn.actors:
-						console.hide(actor,turn.map)
+                    for actor in turn.actors:
+                        console.hide(actor,turn.map)
 					
-				else:
+                else:
 					# save any messages that aren't being printed just yet
-					for msg in turn.msgs:
-						console.addmessage(msg)
+                    for msg in turn.msgs:
+                        console.addmessage(msg)
 					# print messages anyway
-					console.showmessages(libtcod.light_orange)
-					console.blit(console.message)
-					libtcod.console_flush()
-        
-    
+                    console.showmessages(libtcod.light_orange)
+                    console.blit(console.message)
+                    libtcod.console_flush()
+                    
+            print "turns: {t}".format(t=turnNumbers)

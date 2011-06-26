@@ -25,6 +25,16 @@ import libtcodpy as libtcod
 import os
 import random
 
+'''
+Console class:
+
+fields:
+    width:  the width of the console window
+    height: the height of the console window
+    x:      the left edge position of the console
+    y:      the top edge position of the console
+    con:    libtcod's console datatype built from our input fields
+'''
 class console:
     def __init__(self,width,height,x,y):
         self.width = width
@@ -74,21 +84,27 @@ libtcod.console_print_ex(0,GAME_WIDTH,GAME_HEIGHT,libtcod.BKGND_NONE, libtcod.LE
 # the last element is the most recent message
 msghist = [" "," "," "," "," "," "," "," "]
 
+'''
+addmessage: str -> void
+
+    silently appends a message to the message history without blitting to the screen
+    also prints the message to the debug window
+'''
 def addmessage(str):
     global msghist
-    '''
-    silently appends a message to the message history without blitting to the screen
-    '''
     if str != None:
         msghist.append(str)
         print(str)
 
-
+'''
+showmessages:   color ->    void
+    
+    prints the recent message history in the given color
+    
+TODO: give each message its own color code  
+'''
 def showmessages(color=libtcod.white):
     global msghist
-    '''
-    prints the recent message history
-    '''
     
     libtcod.console_clear(message.con)
     
@@ -102,6 +118,12 @@ def showmessages(color=libtcod.white):
             libtcod.console_print(message.con, 0, MSG_HEIGHT-i, msghist[msgindex])
     
 
+'''
+applyval:   color, int, lightcolor -> color
+
+    takes a color, a value offset, and a tint hue, and composes them
+    into a new color
+'''
 def applyval(color, value, lightcolor = libtcod.white):
     newcolor = libtcod.Color(0,0,0)
     newcolor.r = min(255,max(0,color.r + int(value * lightcolor.r)))
@@ -109,41 +131,80 @@ def applyval(color, value, lightcolor = libtcod.white):
     newcolor.b = min(255,max(0,color.b + int(value * lightcolor.b)))
     
     return newcolor
-    
+
+'''
+show:   object -> void
+    takes any displayable game object with x and y coords and
+    prints it to the screen
+'''
 def show(thing):
     libtcod.console_put_char(viewport.con, thing.x, thing.y, thing.char)
 
-def hide(thing, map):
-	if (thing.x,thing.y) in map.keys:
-		tile = tiletochar(map.getTile(thing.x,thing.y),map.getBrightness(thing.x,thing.y),map.visible[thing.x,thing.y],map.getColor(thing.x,thing.y))
+'''
+hide:   object, Map -> void
+    takes any displayable game object and the game's map and then hides
+    'clears' the object from the screen
+'''
+def hide(thing, somemap):
+	if (thing.x,thing.y) in somemap.keys:
+		tile = tiletochar(somemap.getTile(thing.x,thing.y),somemap.getBrightness(thing.x,thing.y),somemap.visible[thing.x,thing.y],somemap.getColor(thing.x,thing.y))
 	else:
-		tile = tiletochar((0,0),map.getBrightness(x,y),False)
+		tile = tiletochar((0,0),somemap.getBrightness(x,y),False)
 	libtcod.console_put_char_ex(viewport.con, thing.x, thing.y, tile[0],tile[1], tile[2])
 
+'''
+blit:   Console, double, double -> void
+    blits a console to the screen with the given foreground and
+    background transparency values (default is 1.0: fully opaque)
+'''
 def blit(console, ffade=1.0, bfade=1.0):
     libtcod.console_blit(console.con, 0, 0, console.width, console.height, 0, console.x, console.y, ffade, bfade)
     # libtcod.console_flush()
-    
+
+'''
+showfps:    void -> void
+    displays the number of frames rendered in the last second
+'''
 def showfps():
     # print FPS
     libtcod.console_print_ex(0,SCREEN_WIDTH-1,0, libtcod.BKGND_NONE, libtcod.RIGHT, 'FPS:' + libtcod.sys_get_fps().__str__())
     
-    
-def printmap(map):
+'''
+printmap:   Map -> void
+    renders the known map to the viewport console,
+    and renders the lights with a noise-based flicker
+'''
+def printmap(somemap):
     global torchconst
     torchconst += 0.2
     flicker = libtcod.noise_get(noise1d,[torchconst]) * 0.1
 	
-    for x,y in map.keys:
-        if map.explored[(x,y)] and map.getVisible(x,y):
-            tile = tiletochar(map.getTile(x,y),map.getBrightness(x,y) - flicker,True,map.getColor(x,y))
+    for x,y in somemap.keys:
+        if somemap.explored[(x,y)] and somemap.getVisible(x,y):
+            tile = tiletochar(somemap.getTile(x,y),somemap.getBrightness(x,y) - flicker,True,somemap.getColor(x,y))
             libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
-            
+
+'''
+hideDisappeared:    Map -> void
+    for the tiles that are no longer in the player's sight,
+    render them in a 'fog of war'
+'''
 def hideDisappeared(map):
     for x,y in map.disappeared:
 		tile = tiletochar(map.getTile(x,y),0,False)
 		libtcod.console_put_char_ex(viewport.con,x,y,tile[0],tile[1],tile[2])
 
+'''
+tiletochar: (int, double), double, boolean, color -> (char, color, color)
+
+    Takes a tuple with (tilecode, slight variation in tile color value),
+    along with the game's brightness value for that tile and whether or not
+    that tile is visible, along with the color of the light shining on
+    that tile.
+    
+    Then it generates a character, and foreground + background color
+    that can be printed to the screen
+'''
 def tiletochar(tuple,brightness,visible,lightcolor=libtcod.black):
     fg = libtcod.pink
     bg = libtcod.black

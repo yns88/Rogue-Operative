@@ -25,24 +25,43 @@ import random
 import engine
 
 '''
+Creature class
+
+fields:
+    x:          X coordinate of the object
+    y:          Y coordinate of object
+    z:          Z coord - which floor level the object is on
+    speed:      default speed of creatures is 1 second per base action
+    nextAction: lambda function that stores this creature's next action
+    char:       character representation of the creature
+    effects:    list of Effect objects that are active on this creature
+
+notes:
     Abstract creature data type
-        all Creatures are Actors
+    all Creatures are Actors
 '''
 class Creature(entities.Actor):
-    x = None            # X coordinate of object
-    y = None            # Y coordinate of object
-    z = None            # Z coord - which floor level the object is on
-    speed = 100         # default speed of creatures is 1 second per base action
-    nextAction = lambda self:0   # lambda function that stores this creature's next action
-    char = '.'          # character representation of the creature
-    effects = []        # list of Effect objects that are active on this creature
+    x = None
+    y = None
+    z = None
+    speed = 100
+    nextAction = lambda self:0
+    char = '.'
+    effects = []
     
+    '''
+    act:    int -> void
+        the placeholder act method, this must be overridden
+    '''
     def act(self, turn):
-        self.nextAction()
+        pass
             
     '''
-    Standard 2-dimensional move action
-    If abs val of relx or rely are greater than 1 then the creature will essentially teleport
+    moveAct:    int, int -> string (or void)
+        Standard 2-dimensional move action to a position relative to
+        the current position.
+        If abs val of relx or rely are greater than 1 then the creature 
+        will essentially teleport.
     '''
     def moveAct(self, relx, rely):
         if engine.gamemap.isBlocked(self.x+relx,self.y+rely):
@@ -54,38 +73,72 @@ class Creature(entities.Actor):
             self.nextAction = lambda: self.place(self.x+relx, self.y+rely)
             self.nextTurn += self.speed
         
+    '''
+    wander: void -> void
+        move 1 space in a random direction
+    '''
     def wander(self):
         self.moveAct(random.randint(-1,1),random.randint(-1,1))
         
+    '''
+    place:  int, int -> void
+        teleport to the given absolute position
+    '''
     def place(self, x, y):
         self.x = x
         self.y = y
         
+'''
+Orc class
 
+parent: Creature
+
+fields:
+    no new fields
+'''
 class Orc(Creature):
     speed = 150
     char = 'o'
     
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+    
+    '''
+    act:    int -> void
+        check if it's your turn. if it is, then complete the previous
+        queued action and then decide to wander in another random 
+        direction for your next turn
+    '''
     def act(self, turn):
         if turn == self.nextTurn:
             self.nextAction()
             self.wander()
-            
         
-    def __init__(self,x,y):
-        self.x = x
-        self.y = y
-        
+'''
+Bat class
+parent: Creature
+
+fields: no new fields
+'''
 class Bat(Creature):
     speed = 30
     char = 'b'
+
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
     
+    '''
+    act:    int -> void
+        check if it's your turn. if it is, then complete the previous
+        queued action and then decide to wander in another random 
+        direction for your next turn
+    '''
     def act(self, turn):
         if turn == self.nextTurn:
             self.nextAction()
             self.wander()
             
         
-    def __init__(self,x,y):
-        self.x = x
-        self.y = y
+
